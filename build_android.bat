@@ -9,14 +9,14 @@ if not exist ".\plugins" mkdir plugins
 
 cd build-android-armeabi-v7a
 rem del ".\*" /f /q /s
-cmake -DBUILD_ANDROID=On -DANDROID_ABI=armeabi-v7a ..\..\
+cmake -DBUILD_ANDROID=On -DANDROID_ABI=armeabi-v7a -G "MinGW Makefiles" -S ..\..\
 make
 
 cd ..
 
 cd build-android-arm64-v8a
 rem del ".\*" /f /q /s
-cmake -DBUILD_ANDROID=On -DANDROID_ABI=arm64-v8a ..\..\
+cmake -DBUILD_ANDROID=On -DANDROID_ABI=arm64-v8a -G "MinGW Makefiles" -S ..\..\
 make
 
 cd ..
