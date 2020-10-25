@@ -24,7 +24,7 @@ cd ..
 cd plugins
 del ".\*" /s /f /q
 mkdir android
-xcopy ..\build-android-armeabi-v7a\bin\org.renderdoc.renderdoccmd.arm32.apk .\plugins\org.renderdoc.renderdoccmd.arm32.apk
-xcopy ..\build-android-arm64-v8a\bin\org.renderdoc.renderdoccmd.arm64.apk .\plugins\org.renderdoc.renderdoccmd.arm64.apk
+xcopy /I ..\build-android-armeabi-v7a\bin\org.renderdoc.renderdoccmd.arm32.apk .\android\
+xcopy /I ..\build-android-arm64-v8a\bin\org.renderdoc.renderdoccmd.arm64.apk .\android\
 
 pause
