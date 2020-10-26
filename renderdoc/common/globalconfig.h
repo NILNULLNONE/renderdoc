@@ -154,11 +154,11 @@
 // Global constants
 enum
 {
-  RenderDoc_FirstTargetControlPort = 38920,
+  RenderDoc_FirstTargetControlPort = 41789,
   RenderDoc_LastTargetControlPort = RenderDoc_FirstTargetControlPort + 7,
-  RenderDoc_RemoteServerPort = 39920,
+  RenderDoc_RemoteServerPort = 42789,
 
-  RenderDoc_ForwardPortBase = 38950,
+  RenderDoc_ForwardPortBase = 47931,
   RenderDoc_ForwardTargetControlOffset = 0,
   RenderDoc_ForwardRemoteServerOffset = 9,
   RenderDoc_ForwardPortStride = 10,
@@ -169,7 +169,8 @@ enum
 #define RENDERDOC_ANDROID_LIBRARY "libVkLayer_GLES_RenderDoc.so"
 
 // This MUST match the package name in the build process that generates per-architecture packages
-#define RENDERDOC_ANDROID_PACKAGE_BASE "org.renderdoc.renderdoccmd"
+//#define RENDERDOC_ANDROID_PACKAGE_BASE "org.renderdoc.renderdoccmd"
+#define RENDERDOC_ANDROID_PACKAGE_BASE "org.codredner.codrednercmd"
 
 /////////////////////////////////////////////////
 // Debugging features configuration

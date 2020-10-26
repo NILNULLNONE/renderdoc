@@ -154,9 +154,9 @@ if(ANDROID)
 
     # Set the package name based on the ABI
     if(ANDROID_ABI STREQUAL "armeabi-v7a")
-        set(RENDERDOC_ANDROID_PACKAGE_NAME "org.renderdoc.renderdoccmd.arm32")
+        set(RENDERDOC_ANDROID_PACKAGE_NAME "org.codredner.codrednercmd.arm32")
     elseif(ANDROID_ABI STREQUAL "arm64-v8a")
-        set(RENDERDOC_ANDROID_PACKAGE_NAME "org.renderdoc.renderdoccmd.arm64")
+        set(RENDERDOC_ANDROID_PACKAGE_NAME "org.codredner.codrednercmd.arm64")
     else()
         message(FATAL_ERROR "ABI ${ANDROID_ABI} is not supported.")
     endif()
