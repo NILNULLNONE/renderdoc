@@ -1,4 +1,5 @@
 @echo off
+cd ..
 if not exist build-android mkdir build-android
 cd build-android
 if not exist build-android-armeabi-v7a mkdir build-android-armeabi-v7a
@@ -12,4 +13,5 @@ rem del ".\*" /f /q /s
 cmake -DBUILD_ANDROID=On -DANDROID_ABI=arm64-v8a -G "MinGW Makefiles" -S ..\..\
 cd ..
 cd ..
+cd android_utility
 if "%~1"=="" (pause)

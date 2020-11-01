@@ -45,20 +45,20 @@ endif()
 
 if(ANDROID)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
-    add_library(renderdoccmd SHARED ${sources})
+    add_library(dxxxr SHARED ${sources})
 else()
     set(CMAKE_SKIP_BUILD_RPATH TRUE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
     set(CMAKE_INSTALL_RPATH "$ORIGIN/:$ORIGIN/../lib${LIB_SUFFIX}/${LIB_SUBFOLDER_TRAIL_SLASH}")
     set(CMAKE_EXE_LINKER_FLAGS "${LINKER_FLAGS}")
 
-    add_executable(renderdoccmd ${sources})
+    add_executable(dxxxr ${sources})
 endif()
 
-target_include_directories(renderdoccmd ${includes})
-target_link_libraries(renderdoccmd ${libraries})
+target_include_directories(dxxxr ${includes})
+target_link_libraries(dxxxr ${libraries})
 
-install (TARGETS renderdoccmd DESTINATION bin)
+install (TARGETS dxxxr DESTINATION bin)
 
 if(ANDROID)
     #############################
@@ -76,9 +76,9 @@ if(ANDROID)
     message(STATUS "Using Java of version ${Java_VERSION}")
 
     if(STRIP_ANDROID_LIBRARY AND CMAKE_STRIP AND CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_custom_command(TARGET renderdoccmd POST_BUILD
-            COMMAND echo Stripping $<TARGET_FILE:renderdoccmd>
-            COMMAND ${CMAKE_STRIP} --strip-unneeded $<TARGET_FILE:renderdoccmd>)
+        add_custom_command(TARGET dxxxr POST_BUILD
+            COMMAND echo Stripping $<TARGET_FILE:dxxxr>
+            COMMAND ${CMAKE_STRIP} --strip-unneeded $<TARGET_FILE:dxxxr>)
     endif()
 
     set(ANDROID_BUILD_TOOLS_VERSION "" CACHE STRING "Version of Android build-tools to use instead of the default")
@@ -154,9 +154,9 @@ if(ANDROID)
 
     # Set the package name based on the ABI
     if(ANDROID_ABI STREQUAL "armeabi-v7a")
-        set(RENDERDOC_ANDROID_PACKAGE_NAME "org.codredner.codrednercmd.arm32")
+        set(RENDERDOC_ANDROID_PACKAGE_NAME "com.cxxxr.dxxxr.a3r2m")
     elseif(ANDROID_ABI STREQUAL "arm64-v8a")
-        set(RENDERDOC_ANDROID_PACKAGE_NAME "org.codredner.codrednercmd.arm64")
+        set(RENDERDOC_ANDROID_PACKAGE_NAME "com.cxxxr.dxxxr.a6r4m")
     else()
         message(FATAL_ERROR "ABI ${ANDROID_ABI} is not supported.")
     endif()
@@ -172,14 +172,14 @@ if(ANDROID)
 
     add_custom_command(OUTPUT ${APK_FILE}
                        DEPENDS renderdoc
-                       DEPENDS renderdoccmd
+                       DEPENDS dxxxr
                        DEPENDS ${KEYSTORE}
                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                        COMMAND ${CMAKE_COMMAND} -E make_directory libs/lib/${ANDROID_ABI}
                        COMMAND ${CMAKE_COMMAND} -E make_directory obj
                        COMMAND ${CMAKE_COMMAND} -E make_directory bin
                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:renderdoc> libs/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:renderdoc>
-                       COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:renderdoccmd> libs/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:renderdoccmd>
+                       COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:dxxxr> libs/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:dxxxr>
                        COMMAND ${BUILD_TOOLS}/aapt package -f -m -S res -J src -M AndroidManifest.xml -I ${ANDROID_JAR}
                        COMMAND ${JAVA_BIN}/javac -d ./obj -source 1.7 -target 1.7 -bootclasspath ${RT_JAR} -classpath "${CLASS_PATH}" -sourcepath src src/org/renderdoc/renderdoccmd/*.java
                        COMMAND ${BUILD_TOOLS}/dx${TOOL_SCRIPT_EXTENSION} --dex --output=bin/classes.dex ./obj

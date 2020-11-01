@@ -114,8 +114,10 @@ rdcstr GetPlainABIName(ABI abi)
 {
   switch(abi)
   {
-    case ABI::arm64_v8a: return "arm64";
-    case ABI::armeabi_v7a: return "arm32";
+    //case ABI::arm64_v8a: return "arm64";
+    //case ABI::armeabi_v7a: return "arm32";
+    case ABI::arm64_v8a: return "a6r4m";
+    case ABI::armeabi_v7a: return "a3r2m";
     case ABI::x86_64: return "x64";
     case ABI::x86: return "x86";
     default: break;

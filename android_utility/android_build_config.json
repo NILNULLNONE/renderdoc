@@ -1,0 +1,23 @@
+{
+    "armeabi_v7a_config" : {
+        "package_name" : "",
+        "suffix" : "v7a"
+    },
+
+    "arme64_v8a_config" : {
+        "package_name" : "",
+        "sufix" : "v8a"
+    },
+
+    "app_name" : "",
+
+    "rdcmd_so_name" : "",
+
+    "vk_so_name" : "",
+    
+    "jdwp_port" : "",
+
+    "forward_port" : "",
+
+    "remote_server_port" : ""
+}
