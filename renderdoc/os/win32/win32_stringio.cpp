@@ -656,9 +656,12 @@ int fclose(FILE *f)
 LogFileHandle *logfile_open(const char *filename)
 {
   rdcwstr wfn = StringFormat::UTF82Wide(filename);
+  //return (LogFileHandle *)CreateFileW(wfn.c_str(), FILE_APPEND_DATA,
+  //                                    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
+  //                                    FILE_ATTRIBUTE_NORMAL, NULL);
   return (LogFileHandle *)CreateFileW(wfn.c_str(), FILE_APPEND_DATA,
-                                      FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
-                                      FILE_ATTRIBUTE_NORMAL, NULL);
+	  FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
+	  FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
 static rdcstr logfile_readall_fallback(uint64_t offset, const wchar_t *filename)
@@ -767,6 +770,27 @@ void logfile_close(LogFileHandle *logHandle, const char *deleteFilename)
     rdcwstr wpath = StringFormat::UTF82Wide(deleteFilename);
     ::DeleteFileW(wpath.c_str());
   }
+}
+
+void logfile_clear(LogFileHandle *&logHandle, const char *filename)
+{
+	CloseHandle((HANDLE)logHandle);
+
+	if (filename)
+	{
+		// we can just try to delete the file. If it's open elsewhere in another process, the delete
+		// will fail.
+		rdcwstr wpath = StringFormat::UTF82Wide(filename);
+		::DeleteFileW(wpath.c_str());
+	}
+
+	rdcwstr wfn = StringFormat::UTF82Wide(filename);
+	logHandle = (LogFileHandle *)CreateFileW(wfn.c_str(), FILE_APPEND_DATA,
+		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+	
+	auto LastError = GetLastError();
+	(void)LastError;
 }
 };
 

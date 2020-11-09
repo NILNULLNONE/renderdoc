@@ -1983,6 +1983,9 @@ DOCUMENT("Internal function for fetching the contents of a log");
 extern "C" RENDERDOC_API void RENDERDOC_CC RENDERDOC_GetLogFileContents(uint64_t offset,
                                                                         rdcstr &logfile);
 
+DOCUMENT("Internal function for clear a log");
+extern "C" RENDERDOC_API void RENDERDOC_CC RENDERDOC_ClearLogFile();
+
 DOCUMENT("Internal function for logging text simply.");
 extern "C" RENDERDOC_API void RENDERDOC_CC RENDERDOC_LogText(const char *text);
 

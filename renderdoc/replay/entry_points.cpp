@@ -284,6 +284,11 @@ extern "C" RENDERDOC_API void RENDERDOC_CC RENDERDOC_GetLogFileContents(uint64_t
   logfile = FileIO::logfile_readall(offset, RDCGETLOGFILE());
 }
 
+extern "C" RENDERDOC_API void RENDERDOC_CC RENDERDOC_ClearLogFile()
+{
+	rdclog_clear();
+}
+
 extern "C" RENDERDOC_API void RENDERDOC_CC RENDERDOC_InitialiseReplay(GlobalEnvironment env,
                                                                       const rdcarray<rdcstr> &args)
 {

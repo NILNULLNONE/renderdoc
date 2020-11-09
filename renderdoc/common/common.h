@@ -444,6 +444,7 @@ const char *rdclog_getfilename();
 void rdclog_filename(const char *filename);
 void rdclog_enableoutput();
 void rdclog_closelog();
+void rdclog_clear();
 
 #define RDCLOGFILE(fn) rdclog_filename(fn)
 #define RDCGETLOGFILE() rdclog_getfilename()

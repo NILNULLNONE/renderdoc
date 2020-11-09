@@ -6,11 +6,11 @@ if not exist build-android-armeabi-v7a mkdir build-android-armeabi-v7a
 if not exist build-android-arm64-v8a mkdir build-android-arm64-v8a
 cd build-android-armeabi-v7a
 rem del ".\*" /f /q /s
-cmake -DBUILD_ANDROID=On -DANDROID_ABI=armeabi-v7a -G "MinGW Makefiles" -S ..\..\
+cmake -DBUILD_ANDROID=On -DANDROID_ABI=armeabi-v7a -DUSE_INTERCEPTOR_LIB=1 -G "MinGW Makefiles" -S ..\..\
 cd ..
 cd build-android-arm64-v8a
 rem del ".\*" /f /q /s
-cmake -DBUILD_ANDROID=On -DANDROID_ABI=arm64-v8a -G "MinGW Makefiles" -S ..\..\
+cmake -DBUILD_ANDROID=On -DANDROID_ABI=arm64-v8a -DUSE_INTERCEPTOR_LIB=1 -G "MinGW Makefiles" -S ..\..\
 cd ..
 cd ..
 cd android_utility

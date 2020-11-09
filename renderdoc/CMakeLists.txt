@@ -1,5 +1,5 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
+set(LLVM_DIR "C:/Program Files (x86)/LLVM/lib/cmake/llvm")
 set(RDOC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(RDOC_DEFINITIONS PRIVATE -DRENDERDOC_EXPORTS)
 set(RDOC_INCLUDES
@@ -491,12 +491,12 @@ option(USE_INTERCEPTOR_LIB OFF)
 
 # on Android, pull in interceptor-lib only if we have LLVM available
 if(ANDROID AND USE_INTERCEPTOR_LIB )
-    find_package(LLVM CONFIG)
+    find_package(LLVM REQUIRED CONFIG)
 
     if(NOT LLVM_FOUND)
         message(FATAL_ERROR "LLVM not found - interceptor-lib requires LLVM 4.0 available.")
-    elseif(${LLVM_PACKAGE_VERSION} VERSION_LESS "4.0.0" OR ${LLVM_PACKAGE_VERSION} VERSION_GREATER "4.0.1")
-        message(FATAL_ERROR "LLVM ${LLVM_PACKAGE_VERSION} found - we require precisely 4.0.")
+    #elseif(${LLVM_PACKAGE_VERSION} VERSION_LESS "4.0.0" OR ${LLVM_PACKAGE_VERSION} VERSION_GREATER "4.0.1")
+    #    message(FATAL_ERROR "LLVM ${LLVM_PACKAGE_VERSION} found - we require precisely 4.0.")
     else()
         message(STATUS "LLVM ${LLVM_PACKAGE_VERSION} found - enabling android hooking using interceptor-lib.")
         add_subdirectory(3rdparty/interceptor-lib)

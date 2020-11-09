@@ -68,6 +68,7 @@ private slots:
   void on_textFilter_textChanged(const QString &text);
   void on_textFilterMeaning_currentIndexChanged(int index);
   void on_regexpFilter_toggled();
+  void on_clear_clicked();
 
   // manual slots
   void messages_refresh();
