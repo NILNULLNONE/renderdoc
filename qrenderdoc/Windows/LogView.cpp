@@ -31,6 +31,7 @@
 #include <QStandardItemModel>
 #include "Code/QRDUtils.h"
 #include "Widgets/Extended/RDHeaderView.h"
+
 #include "ui_LogView.h"
 
 enum Columns
@@ -277,6 +278,14 @@ LogView::LogView(ICaptureContext &ctx, QWidget *parent)
 {
   ui->setupUi(this);
 
+  {
+	  QToolButton* ClearButton = new QToolButton(this);
+	  ClearButton->setObjectName(QStringLiteral("clear"));
+	  ClearButton->setText(QStringLiteral("clear"));
+	  ui->horizontalLayout->addWidget(ClearButton);
+	  connect(ClearButton, &QToolButton::clicked, this, &LogView::on_clear_clicked);
+  }
+
   m_ItemModel = new LogItemModel(this);
   m_FilterModel = new LogFilterModel(this);
 
@@ -394,6 +403,24 @@ void LogView::on_regexpFilter_toggled()
 {
   m_FilterModel->m_UseRegexp = ui->regexpFilter->isChecked();
   m_FilterModel->refresh();
+}
+
+void LogView::on_clear_clicked()
+{
+	RENDERDOC_ClearLogFile();
+	this->prevOffset = 0;
+	this->m_Messages.clear();
+	this->m_PIDs.clear();
+	this->m_PIDModel->clear();
+	auto OldItemModel = this->m_ItemModel;
+	auto OldeFilterModel = this->m_FilterModel;
+	this->m_ItemModel = new LogItemModel(this);
+	this->m_FilterModel = new LogFilterModel(this);
+	m_FilterModel->setSourceModel(m_ItemModel);
+	this->ui->messages->setModel(nullptr);
+	this->ui->messages->setModel(this->m_FilterModel);
+	delete OldItemModel;
+	delete OldeFilterModel;
 }
 
 void LogView::messages_keyPress(QKeyEvent *event)

@@ -502,3 +502,15 @@ void rdclog_direct(time_t utcTime, uint32_t pid, LogType type, const char *proje
 
   SAFE_DELETE_ARRAY(oversizedBuffer);
 }
+
+void rdclog_clear()
+{
+	static Threading::CriticalSection *lock = new Threading::CriticalSection();
+	SCOPED_LOCK(*lock);
+#if ENABLED(OUTPUT_LOG_TO_DISK)
+	if (logfileHandle)
+	{
+		FileIO::logfile_clear(logfileHandle, logfile->c_str());
+	}
+#endif
+}

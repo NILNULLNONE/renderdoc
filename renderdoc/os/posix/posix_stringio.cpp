@@ -574,6 +574,13 @@ void logfile_close(LogFileHandle *logHandle, const char *deleteFilename)
     close(fd);
   }
 }
+
+void logfile_clear(LogFileHandle *&logHandle, const char *filename)
+{
+	// nothing to do
+	(void)logHandle;
+	(void)filename;
+}
 };
 
 namespace StringFormat

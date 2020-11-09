@@ -324,6 +324,7 @@ struct LogFileHandle;
 LogFileHandle *logfile_open(const char *filename);
 void logfile_append(LogFileHandle *logHandle, const char *msg, size_t length);
 void logfile_close(LogFileHandle *logHandle, const char *deleteFilename);
+void logfile_clear(LogFileHandle *&logHandle, const char *filename);
 
 // read the whole logfile into memory starting at a given offset. This may race with processes
 // writing, but it will read the whole of the file at some point. Useful since normal file reading
