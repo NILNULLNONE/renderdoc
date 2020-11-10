@@ -767,7 +767,8 @@ extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char 
 
     if (starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
     {
-      return fopen_maps(filename, mode);
+      (void)fopen_maps;
+      // return fopen_maps(filename, mode);
     }
 
     if (starts_with(filename, "/proc/") && ends_with(filename, "/status"))
@@ -816,7 +817,8 @@ extern "C" __attribute__((visibility("default"))) int hooked_open(const char *pa
 
     if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
     {
-      return open_maps(path, oflag);
+      (void)open_maps;
+      // return open_maps(path, oflag);
     }
 
     if (starts_with(path, "/proc/") && ends_with(path, "/status"))
