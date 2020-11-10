@@ -531,153 +531,153 @@ extern "C" __attribute__((visibility("default"))) void *hooked_dlsym(void *handl
   return ret;
 }
 
-//extern "C" typedef int(*OpenType)(const char *path, int oflag);
-//
-//extern "C" typedef FILE *(*FopenType)(const char *filename, const char *mode);
+extern "C" typedef int(*OpenType)(const char *path, int oflag);
+
+extern "C" typedef FILE *(*FopenType)(const char *filename, const char *mode);
 
 //extern "C" typedef size_t(*FreadType)(void * ptr, size_t size, size_t count, FILE * stream);
 
-//static FopenType orig_fopen;
-//
-//static OpenType orig_open;
+static FopenType orig_fopen;
+
+static OpenType orig_open;
 
 //static FreadType orig_fread;
 
-//static bool starts_with(const char *str, const char *target)
-//{
-//  int str_len = strlen(str);
-//  int target_len = strlen(target);
-//  if(str_len >= target_len)
-//  {
-//    for(int i = 0; i < target_len; i++)
-//    {
-//		if (str[i] != target[i])
-//		{
-//			return false;
-//		}
-//    }
-//	return true;
-//  }
-//  return false;
-//}
-//
-//static bool ends_with(const char *str, const char *target) {
-//	int str_len = strlen(str);
-//	int target_len = strlen(target);
-//	if (str_len >= target_len)
-//	{
-//		for (int i = 1; i <= target_len; i++)
-//		{
-//			if (str[str_len - i] != target[target_len - i])
-//			{
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
-//	return false;
-//}
-//
-//// You must free the result if result is non-NULL.
-//char *str_replace(char *orig, const char *rep, const char *with) {
-//	char *result; // the return string
-//	char *ins;    // the next insert point
-//	char *tmp;    // varies
-//	int len_rep;  // length of rep (the string to remove)
-//	int len_with; // length of with (the string to replace rep with)
-//	int len_front; // distance between rep and end of last rep
-//	int count;    // number of replacements
-//
-//	// sanity checks and initialization
-//	if (!orig || !rep)
-//		return NULL;
-//	len_rep = strlen(rep);
-//	if (len_rep == 0)
-//		return NULL; // empty rep causes infinite loop during count
-//	if (!with)
-//		return NULL;
-//	len_with = strlen(with);
-//
-//	// count the number of replacements needed
-//	ins = orig;
-//	for (count = 0; (bool)(tmp = strstr(ins, rep)); ++count) {
-//		ins = tmp + len_rep;
-//	}
-//
-//	tmp = result = (char*)malloc(strlen(orig) + (len_with - len_rep) * count + 1);
-//
-//	if (!result)
-//		return NULL;
-//
-//	// first time through the loop, all the variable are set correctly
-//	// from here on,
-//	//    tmp points to the end of the result string
-//	//    ins points to the next occurrence of rep in orig
-//	//    orig points to the remainder of orig after "end of rep"
-//	while (count--) {
-//		ins = strstr(orig, rep);
-//		len_front = ins - orig;
-//		tmp = strncpy(tmp, orig, len_front) + len_front;
-//		tmp = strcpy(tmp, with) + len_with;
-//		orig += len_front + len_rep; // move to next "end of rep"
-//	}
-//	strcpy(tmp, orig);
-//	return result;
-//}
+static bool starts_with(const char *str, const char *target)
+{
+  int str_len = strlen(str);
+  int target_len = strlen(target);
+  if(str_len >= target_len)
+  {
+    for(int i = 0; i < target_len; i++)
+    {
+		if (str[i] != target[i])
+		{
+			return false;
+		}
+    }
+	return true;
+  }
+  return false;
+}
 
-//static int counter = 0;
+static bool ends_with(const char *str, const char *target) {
+	int str_len = strlen(str);
+	int target_len = strlen(target);
+	if (str_len >= target_len)
+	{
+		for (int i = 1; i <= target_len; i++)
+		{
+			if (str[str_len - i] != target[target_len - i])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+// You must free the result if result is non-NULL.
+char *str_replace(char *orig, const char *rep, const char *with) {
+	char *result; // the return string
+	char *ins;    // the next insert point
+	char *tmp;    // varies
+	int len_rep;  // length of rep (the string to remove)
+	int len_with; // length of with (the string to replace rep with)
+	int len_front; // distance between rep and end of last rep
+	int count;    // number of replacements
+
+	// sanity checks and initialization
+	if (!orig || !rep)
+		return NULL;
+	len_rep = strlen(rep);
+	if (len_rep == 0)
+		return NULL; // empty rep causes infinite loop during count
+	if (!with)
+		return NULL;
+	len_with = strlen(with);
+
+	// count the number of replacements needed
+	ins = orig;
+	for (count = 0; (bool)(tmp = strstr(ins, rep)); ++count) {
+		ins = tmp + len_rep;
+	}
+
+	tmp = result = (char*)malloc(strlen(orig) + (len_with - len_rep) * count + 1);
+
+	if (!result)
+		return NULL;
+
+	// first time through the loop, all the variable are set correctly
+	// from here on,
+	//    tmp points to the end of the result string
+	//    ins points to the next occurrence of rep in orig
+	//    orig points to the remainder of orig after "end of rep"
+	while (count--) {
+		ins = strstr(orig, rep);
+		len_front = ins - orig;
+		tmp = strncpy(tmp, orig, len_front) + len_front;
+		tmp = strcpy(tmp, with) + len_with;
+		orig += len_front + len_rep; // move to next "end of rep"
+	}
+	strcpy(tmp, orig);
+	return result;
+}
+
+static int counter = 0;
 //static int status_counter = 0;
-//// /data/app/com.tencent.tmgp.wuxia-60OMJPRIwCqNGXQxHQtRbQ==/lib/arm64/libAkSoundEngine.so
-//// /data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libtersafe2.so
-////const char* TheirName = "/data/app/com.tencent.tmgp.wuxia-60OMJPRIwCqNGXQxHQtRbQ==/lib/arm64/libAkSoundEngine.so";
-//const char* TheirName = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libtersafe2.so";
+// /data/app/com.tencent.tmgp.wuxia-60OMJPRIwCqNGXQxHQtRbQ==/lib/arm64/libAkSoundEngine.so
+// /data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libtersafe2.so
+//const char* TheirName = "/data/app/com.tencent.tmgp.wuxia-60OMJPRIwCqNGXQxHQtRbQ==/lib/arm64/libAkSoundEngine.so";
+const char* TheirName = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libtersafe2.so";
 
-//static char* base_open_maps(const char* filename)
-//{
-//	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! READ MAPS");
-////RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! counter: %d", counter);
-//
-//// open true .maps
-//	FILE *TrueMapsFile = orig_fopen(filename, "r");
-//	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! True Map File: %p", TrueMapsFile);
-//	// create fake file name
-//	//char FakeFilename[1024] = {};
-//	char* FakeFilename = (char*)malloc(sizeof(char) * 1024);
-//	(counter = (counter + 1) % 10);
-//	sprintf(FakeFilename, "%s_%d", "/data/local/tmp/f_a_k_e_m_a_p_s", counter);
-//	// open fake .maps
-//	FILE *FakeMapsFile = orig_fopen(FakeFilename, "w");
-//	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! Fake Map File: %s %p", FakeFilename, FakeMapsFile);
-//
-//	char LineBuf[1024] = {};
-//	char* OurSoPath = NULL;
-//	const char* PrefStr = "/data/app/com.cxxxr.dxxxr";
-//	while (fgets(LineBuf, 1024, TrueMapsFile)) {
-//		char* Prefix = strstr(LineBuf, PrefStr);
-//		if (Prefix)
-//		{
-//			if (!OurSoPath)
-//			{
-//				const int Len = sizeof(char) * 78;
-//				OurSoPath = (char*)malloc(Len + 1);
-//				memset(OurSoPath, 0, Len + 1);
-//				strncpy(OurSoPath, Prefix, Len);
-//			}
-//			auto Result = str_replace(LineBuf, OurSoPath, TheirName);
-//			fputs(Result, FakeMapsFile);
-//			//RDCLOG("%s, %s, %s", Result, OurSoPath, TheirName);
-//		}
-//		else
-//		{
-//			fputs(LineBuf, FakeMapsFile);
-//		}
-//	}
-//
-//	fclose(TrueMapsFile);
-//	fclose(FakeMapsFile);
-//	return FakeFilename;
-//}
-//
+static char* base_open_maps(const char* filename)
+{
+	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! READ MAPS");
+//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! counter: %d", counter);
+
+// open true .maps
+	FILE *TrueMapsFile = orig_fopen(filename, "r");
+	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! True Map File: %p", TrueMapsFile);
+	// create fake file name
+	//char FakeFilename[1024] = {};
+	char* FakeFilename = (char*)malloc(sizeof(char) * 1024);
+	(counter = (counter + 1) % 10);
+	sprintf(FakeFilename, "%s_%d", "/data/local/tmp/f_a_k_e_m_a_p_s", counter);
+	// open fake .maps
+	FILE *FakeMapsFile = orig_fopen(FakeFilename, "w");
+	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! Fake Map File: %s %p", FakeFilename, FakeMapsFile);
+
+	char LineBuf[1024] = {};
+	char* OurSoPath = NULL;
+	const char* PrefStr = "/data/app/com.cxxxr.dxxxr";
+	while (fgets(LineBuf, 1024, TrueMapsFile)) {
+		char* Prefix = strstr(LineBuf, PrefStr);
+		if (Prefix)
+		{
+			if (!OurSoPath)
+			{
+				const int Len = sizeof(char) * 78;
+				OurSoPath = (char*)malloc(Len + 1);
+				memset(OurSoPath, 0, Len + 1);
+				strncpy(OurSoPath, Prefix, Len);
+			}
+			auto Result = str_replace(LineBuf, OurSoPath, TheirName);
+			fputs(Result, FakeMapsFile);
+			//RDCLOG("%s, %s, %s", Result, OurSoPath, TheirName);
+		}
+		else
+		{
+			fputs(LineBuf, FakeMapsFile);
+		}
+	}
+
+	fclose(TrueMapsFile);
+	fclose(FakeMapsFile);
+	return FakeFilename;
+}
+
 //static char* base_open_status(const char* filename)
 //{
 //	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! READ MAPS");
@@ -731,99 +731,99 @@ extern "C" __attribute__((visibility("default"))) void *hooked_dlsym(void *handl
 //	return ret;
 //}
 //
-//static FILE* fopen_maps(const char* filename, const char* mode)
-//{
-//	auto fn = base_open_maps(filename);
-//	auto ret = orig_fopen(fn, mode);
-//	free(fn);
-//	return ret;
-//}
-//
-//static int open_maps(const char* path, int oflag)
-//{
-//	auto fn = base_open_maps(path);
-//	auto ret = orig_open(fn, oflag);
-//	free(fn);
-//	return ret;
-//}
-//
+static FILE* fopen_maps(const char* filename, const char* mode)
+{
+	auto fn = base_open_maps(filename);
+	auto ret = orig_fopen(fn, mode);
+	free(fn);
+	return ret;
+}
+
+static int open_maps(const char* path, int oflag)
+{
+	auto fn = base_open_maps(path);
+	auto ret = orig_open(fn, oflag);
+	free(fn);
+	return ret;
+}
+
 //static void log_callstack()
 //{
 //	return;
 //}
 
-//// /data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libunity.so
-//// /data/app/com.cxxxr.dxxxr.a6r4m-pnDWnX65bDkYXln-U99fTQ==/lib/arm64/libdxxxv.so
-//extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char *filename, const char *mode)
-//{
-//  // if(filename && mode)
-//  //{
-//	pid_t tid = gettid();
-//	RDCLOG("<%d> ################################### fopen %s, %s", tid, filename, mode);
-//	if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
-//	{
-//		log_callstack();
-//	}
-//
-//   if (false && starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
-//   {
-//	   return fopen_maps(filename, mode);
-//   }
-//
-//   if (starts_with(filename, "/proc/") && ends_with(filename, "/status"))
-//   {
-//	   //return fopen_status(filename, mode);
-//	   (void)fopen_status;
-//   }
-//
-//   //if (starts_with(filename, "/data/app/com.cxxxr.dxxxr.")
-//	  // && ends_with(filename, ".apk"))
-//   //{
-//	  // const char* fake_apk_path = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/base.apk";
-//	  // RDCLOG("*********************************** fake com.cxxxr.dxxr, %s", filename);
-//	  // return orig_fopen(fake_apk_path, mode);
-//   //}
-//  //if(starts_with(filename, "/proc/"))
-//  //{
-//	 // if (ends_with(filename, "/maps")) {
-//		//  const char *fake_maps_path = "/data/local/tmp/fake_ys.maps";
-//		//  FILE* fake_file = orig_fopen(fake_maps_path, mode);
-//		//  RDCLOG("################################### fake maps open %s %p", filename, fake_file);
-//		//  return fake_file;
-//	 // }
-//	 // else if(ends_with(filename, "/smaps")){
-//		//  const char *fake_smaps_path = "/data/local/tmp/fake_ys.smaps";
-//		//  FILE* fake_file = orig_fopen(fake_smaps_path, mode);
-//		//  RDCLOG("################################### fake smaps open %s %p", filename, fake_file);
-//		//  return fake_file;
-//	 // }
-//  //}
-//	 // 
-//  //RDCLOG("################################### normal open %s %s", filename, mode);
-//  return orig_fopen(filename, mode);
-//}
-//
-//extern "C" __attribute__((visibility("default"))) int hooked_open(const char *path, int oflag)
-//{
-//	pid_t tid = gettid();
-//	RDCLOG("<%d> ************************************************ open %s, %d", tid, path, oflag);
-//	if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
-//	{
-//		log_callstack();
-//	}
-//
-//	if (false && starts_with(path, "/proc/") && ends_with(path, "/maps"))
-//	{
-//		return open_maps(path, oflag);
-//	}
-//
-//	if (starts_with(path, "/proc/") && ends_with(path, "/status"))
-//	{
-//		//return open_status(path, oflag);
-//		(void)open_status;
-//	}
-//	return orig_open(path, oflag);
-//}
+// /data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libunity.so
+// /data/app/com.cxxxr.dxxxr.a6r4m-pnDWnX65bDkYXln-U99fTQ==/lib/arm64/libdxxxv.so
+extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char *filename, const char *mode)
+{
+  // if(filename && mode)
+  //{
+	pid_t tid = gettid();
+	RDCLOG("<%d> ################################### fopen %s, %s", tid, filename, mode);
+	//if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
+	//{
+	//	log_callstack();
+	//}
+
+   if (starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
+   {
+	   return fopen_maps(filename, mode);
+   }
+
+   if (starts_with(filename, "/proc/") && ends_with(filename, "/status"))
+   {
+	   //return fopen_status(filename, mode);
+	   //(void)fopen_status;
+   }
+
+   //if (starts_with(filename, "/data/app/com.cxxxr.dxxxr.")
+	  // && ends_with(filename, ".apk"))
+   //{
+	  // const char* fake_apk_path = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/base.apk";
+	  // RDCLOG("*********************************** fake com.cxxxr.dxxr, %s", filename);
+	  // return orig_fopen(fake_apk_path, mode);
+   //}
+  //if(starts_with(filename, "/proc/"))
+  //{
+	 // if (ends_with(filename, "/maps")) {
+		//  const char *fake_maps_path = "/data/local/tmp/fake_ys.maps";
+		//  FILE* fake_file = orig_fopen(fake_maps_path, mode);
+		//  RDCLOG("################################### fake maps open %s %p", filename, fake_file);
+		//  return fake_file;
+	 // }
+	 // else if(ends_with(filename, "/smaps")){
+		//  const char *fake_smaps_path = "/data/local/tmp/fake_ys.smaps";
+		//  FILE* fake_file = orig_fopen(fake_smaps_path, mode);
+		//  RDCLOG("################################### fake smaps open %s %p", filename, fake_file);
+		//  return fake_file;
+	 // }
+  //}
+	 // 
+  //RDCLOG("################################### normal open %s %s", filename, mode);
+  return orig_fopen(filename, mode);
+}
+
+extern "C" __attribute__((visibility("default"))) int hooked_open(const char *path, int oflag)
+{
+	pid_t tid = gettid();
+	RDCLOG("<%d> ************************************************ open %s, %d", tid, path, oflag);
+	//if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
+	//{
+	//	log_callstack();
+	//}
+
+	if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
+	{
+		return open_maps(path, oflag);
+	}
+
+	if (starts_with(path, "/proc/") && ends_with(path, "/status"))
+	{
+		//return open_status(path, oflag);
+		//(void)open_status;
+	}
+	return orig_open(path, oflag);
+}
 
 //extern "C" __attribute__((visibility("default"))) size_t fread(void * ptr, size_t size, size_t count, FILE * stream)
 //{
@@ -852,10 +852,10 @@ static void InstallHooksCommon()
     RDCWARN("Couldn't find __loader_dlopen, falling back to slow path for dlopen hooking");
     LibraryHooks::RegisterFunctionHook("", FunctionHook("dlsym", NULL, (void *)&hooked_dlsym));
   }
-  //LibraryHooks::RegisterFunctionHook(
-  //    "", FunctionHook("fopen", (void **)&orig_fopen, (void *)&hooked_fopen));
-  //LibraryHooks::RegisterFunctionHook(
-	 // "", FunctionHook("open", (void **)&orig_open, (void *)&hooked_open));
+  LibraryHooks::RegisterFunctionHook(
+      "", FunctionHook("fopen", (void **)&orig_fopen, (void *)&hooked_fopen));
+  LibraryHooks::RegisterFunctionHook(
+	  "", FunctionHook("open", (void **)&orig_open, (void *)&hooked_open));
   LibraryHooks::RegisterFunctionHook(
       "", FunctionHook("android_dlopen_ext", NULL, (void *)&hooked_android_dlopen_ext));
 }
