@@ -756,48 +756,48 @@ static int open_maps(const char* path, int oflag)
 // /data/app/com.cxxxr.dxxxr.a6r4m-pnDWnX65bDkYXln-U99fTQ==/lib/arm64/libdxxxv.so
 extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char *filename, const char *mode)
 {
-  // if(filename && mode)
-  //{
-	pid_t tid = gettid();
-	RDCLOG("<%d> ################################### fopen %s, %s", tid, filename, mode);
-	//if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
-	//{
-	//	log_callstack();
-	//}
+  if(filename && mode)
+  {
+    pid_t tid = gettid();
+    RDCLOG("<%d> ################################### fopen %s, %s", tid, filename, mode);
+    //if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
+    //{
+    //	log_callstack();
+    //}
 
-   if (starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
-   {
-	   return fopen_maps(filename, mode);
-   }
+    if (starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
+    {
+      return fopen_maps(filename, mode);
+    }
 
-   if (starts_with(filename, "/proc/") && ends_with(filename, "/status"))
-   {
-	   //return fopen_status(filename, mode);
-	   //(void)fopen_status;
-   }
+    if (starts_with(filename, "/proc/") && ends_with(filename, "/status"))
+    {
+      //return fopen_status(filename, mode);
+      //(void)fopen_status;
+    }
 
-   //if (starts_with(filename, "/data/app/com.cxxxr.dxxxr.")
-	  // && ends_with(filename, ".apk"))
-   //{
-	  // const char* fake_apk_path = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/base.apk";
-	  // RDCLOG("*********************************** fake com.cxxxr.dxxr, %s", filename);
-	  // return orig_fopen(fake_apk_path, mode);
-   //}
-  //if(starts_with(filename, "/proc/"))
-  //{
-	 // if (ends_with(filename, "/maps")) {
-		//  const char *fake_maps_path = "/data/local/tmp/fake_ys.maps";
-		//  FILE* fake_file = orig_fopen(fake_maps_path, mode);
-		//  RDCLOG("################################### fake maps open %s %p", filename, fake_file);
-		//  return fake_file;
-	 // }
-	 // else if(ends_with(filename, "/smaps")){
-		//  const char *fake_smaps_path = "/data/local/tmp/fake_ys.smaps";
-		//  FILE* fake_file = orig_fopen(fake_smaps_path, mode);
-		//  RDCLOG("################################### fake smaps open %s %p", filename, fake_file);
-		//  return fake_file;
-	 // }
-  //}
+    //if (starts_with(filename, "/data/app/com.cxxxr.dxxxr.")
+      // && ends_with(filename, ".apk"))
+    //{
+      // const char* fake_apk_path = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/base.apk";
+      // RDCLOG("*********************************** fake com.cxxxr.dxxr, %s", filename);
+      // return orig_fopen(fake_apk_path, mode);
+    //}
+    //if(starts_with(filename, "/proc/"))
+    //{
+    // if (ends_with(filename, "/maps")) {
+      //  const char *fake_maps_path = "/data/local/tmp/fake_ys.maps";
+      //  FILE* fake_file = orig_fopen(fake_maps_path, mode);
+      //  RDCLOG("################################### fake maps open %s %p", filename, fake_file);
+      //  return fake_file;
+    // }
+    // else if(ends_with(filename, "/smaps")){
+      //  const char *fake_smaps_path = "/data/local/tmp/fake_ys.smaps";
+      //  FILE* fake_file = orig_fopen(fake_smaps_path, mode);
+      //  RDCLOG("################################### fake smaps open %s %p", filename, fake_file);
+      //  return fake_file;
+    // }
+  }
 	 // 
   //RDCLOG("################################### normal open %s %s", filename, mode);
   return orig_fopen(filename, mode);
@@ -805,23 +805,26 @@ extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char 
 
 extern "C" __attribute__((visibility("default"))) int hooked_open(const char *path, int oflag)
 {
-	pid_t tid = gettid();
-	RDCLOG("<%d> ************************************************ open %s, %d", tid, path, oflag);
-	//if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
-	//{
-	//	log_callstack();
-	//}
+  if(path)
+  {
+    pid_t tid = gettid();
+    RDCLOG("<%d> ************************************************ open %s, %d", tid, path, oflag);
+    //if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
+    //{
+    //	log_callstack();
+    //}
 
-	if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
-	{
-		return open_maps(path, oflag);
-	}
+    if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
+    {
+      return open_maps(path, oflag);
+    }
 
-	if (starts_with(path, "/proc/") && ends_with(path, "/status"))
-	{
-		//return open_status(path, oflag);
-		//(void)open_status;
-	}
+    if (starts_with(path, "/proc/") && ends_with(path, "/status"))
+    {
+      //return open_status(path, oflag);
+      //(void)open_status;
+    }
+  }
 	return orig_open(path, oflag);
 }
 
