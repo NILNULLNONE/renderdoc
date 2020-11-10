@@ -531,7 +531,7 @@ extern "C" __attribute__((visibility("default"))) void *hooked_dlsym(void *handl
   return ret;
 }
 
-extern "C" typedef int(*OpenType)(const char *path, int oflag);
+//extern "C" typedef int(*OpenType)(const char *path, int oflag);
 
 extern "C" typedef FILE *(*FopenType)(const char *filename, const char *mode);
 
@@ -539,7 +539,7 @@ extern "C" typedef FILE *(*FopenType)(const char *filename, const char *mode);
 
 static FopenType orig_fopen;
 
-static OpenType orig_open;
+//static OpenType orig_open;
 
 //static FreadType orig_fread;
 
@@ -739,13 +739,13 @@ static FILE* fopen_maps(const char* filename, const char* mode)
 	return ret;
 }
 
-static int open_maps(const char* path, int oflag)
-{
-	auto fn = base_open_maps(path);
-	auto ret = orig_open(fn, oflag);
-	free(fn);
-	return ret;
-}
+//static int open_maps(const char* path, int oflag)
+//{
+//	auto fn = base_open_maps(path);
+//	auto ret = orig_open(fn, oflag);
+//	free(fn);
+//	return ret;
+//}
 
 //static void log_callstack()
 //{
@@ -804,31 +804,30 @@ extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char 
   return orig_fopen(filename, mode);
 }
 
-extern "C" __attribute__((visibility("default"))) int hooked_open(const char *path, int oflag)
-{
-  if(path)
-  {
-    pid_t tid = gettid();
-    RDCLOG("<%d> ************************************************ open %s, %d", tid, path, oflag);
-    //if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
-    //{
-    //	log_callstack();
-    //}
-
-    if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
-    {
-      (void)open_maps;
-      // return open_maps(path, oflag);
-    }
-
-    if (starts_with(path, "/proc/") && ends_with(path, "/status"))
-    {
-      //return open_status(path, oflag);
-      //(void)open_status;
-    }
-  }
-	return orig_open(path, oflag);
-}
+//extern "C" __attribute__((visibility("default"))) int hooked_open(const char *path, int oflag)
+//{
+//  if(path)
+//  {
+//    pid_t tid = gettid();
+//    RDCLOG("<%d> ************************************************ open %s, %d", tid, path, oflag);
+//    //if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
+//    //{
+//    //	log_callstack();
+//    //}
+//
+//    if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
+//    {
+//      return open_maps(path, oflag);
+//    }
+//
+//    if (starts_with(path, "/proc/") && ends_with(path, "/status"))
+//    {
+//      //return open_status(path, oflag);
+//      //(void)open_status;
+//    }
+//  }
+//	return orig_open(path, oflag);
+//}
 
 //extern "C" __attribute__((visibility("default"))) size_t fread(void * ptr, size_t size, size_t count, FILE * stream)
 //{
@@ -859,8 +858,8 @@ static void InstallHooksCommon()
   }
   LibraryHooks::RegisterFunctionHook(
       "", FunctionHook("fopen", (void **)&orig_fopen, (void *)&hooked_fopen));
-  LibraryHooks::RegisterFunctionHook(
-	  "", FunctionHook("open", (void **)&orig_open, (void *)&hooked_open));
+  //LibraryHooks::RegisterFunctionHook(
+	 // "", FunctionHook("open", (void **)&orig_open, (void *)&hooked_open));
   LibraryHooks::RegisterFunctionHook(
       "", FunctionHook("android_dlopen_ext", NULL, (void *)&hooked_android_dlopen_ext));
 }
