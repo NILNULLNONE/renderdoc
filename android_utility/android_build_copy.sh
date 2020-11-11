@@ -7,6 +7,7 @@ mkdir -p android
 cp ../build-android-armeabi-v7a/bin/*.apk ./android/
 cp ../build-android-arm64-v8a/bin/*.apk ./android/
 cd ../../android_utility
+cp -rf ../build-android/plugins /mnt/shared/
 if [ -z "$1" ]
 then
         read -n1 -r -p "Press any key to continue..." key
