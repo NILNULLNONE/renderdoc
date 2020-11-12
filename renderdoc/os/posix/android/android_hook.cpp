@@ -656,8 +656,9 @@ static char* base_open_maps(const char* filename)
 {
 	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! READ MAPS");
 //RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! counter: %d", counter);
-
-// open true .maps
+	if (orig_fopen == NULL)
+		orig_fopen = fopen;
+	// open true .maps
 	FILE *TrueMapsFile = orig_fopen(filename, "r");
 	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! True Map File: %p", TrueMapsFile);
 	// create fake file name
@@ -701,7 +702,11 @@ static char* base_open_maps(const char* filename)
 static FILE* fopen_maps(const char* filename, const char* mode)
 {
 	auto fn = base_open_maps(filename);
-	auto ret = orig_fopen(fn, mode);
+	FILE* ret = NULL;
+	if (orig_fopen)
+		ret = orig_fopen(fn, mode);
+	else
+		ret = fopen(fn, mode);
 	free(fn);
 	return ret;
 }
@@ -710,7 +715,10 @@ static int open_maps(const char* path, int oflag)
 {
 	auto fn = base_open_maps(path);
 	int ret = 0;
-	ret = orig_open(fn, oflag);
+	if (orig_open)
+		ret = orig_open(fn, oflag);
+	else
+		ret = open(fn, oflag);
 	free(fn);
 	return ret;
 }
@@ -726,7 +734,9 @@ extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char 
 	if(starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
 		return fopen_maps(filename, mode);
   }
-  return orig_fopen(filename, mode);
+  if(orig_fopen)
+	return orig_fopen(filename, mode);
+  return fopen(filename, mode);
 }
 
 extern "C" __attribute__((visibility("default"))) int hooked_open(const char *path, int oflag)
@@ -738,7 +748,9 @@ extern "C" __attribute__((visibility("default"))) int hooked_open(const char *pa
    if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
 	   return open_maps(path, oflag);
  }
-  return orig_open(path, oflag);
+ if(orig_open)
+	 return orig_open(path, oflag);
+ return open(path, oflag);
 }
 
 #define CLOCK_DIVISOR 1
