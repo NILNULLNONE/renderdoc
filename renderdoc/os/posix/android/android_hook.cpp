@@ -40,6 +40,8 @@
 #include <stddef.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
 #include <algorithm>
 #include <map>
 #include <set>
@@ -532,18 +534,33 @@ extern "C" __attribute__((visibility("default"))) void *hooked_dlsym(void *handl
   return ret;
 }
 
+///////////////////////////////////////////////////////////
+// Type def
 extern "C" typedef int(*OpenType)(const char *path, int oflag);
 
 extern "C" typedef FILE *(*FopenType)(const char *filename, const char *mode);
 
+extern "C" typedef clock_t (*ClockType)(void);
+
+extern "C" typedef int (*GetTimeOfDayType)(struct timeval *tv, struct timezone *tz);
+
+extern "C" typedef int (*ClockGetTimeType)(clockid_t clockid, struct timespec *tp);
 //extern "C" typedef size_t(*FreadType)(void * ptr, size_t size, size_t count, FILE * stream);
 
 static FopenType orig_fopen;
 
 static OpenType orig_open;
 
+static ClockType orig_clock;
+
+static GetTimeOfDayType orig_get_time_of_day;
+
+static ClockGetTimeType orig_clock_get_time;
+
 //static FreadType orig_fread;
 
+///////////////////////////////////////////////////////////
+// string utility
 static bool starts_with(const char *str, const char *target)
 {
   int str_len = strlen(str);
@@ -633,6 +650,8 @@ static int counter = 0;
 //const char* TheirName = "/data/app/com.tencent.tmgp.wuxia-60OMJPRIwCqNGXQxHQtRbQ==/lib/arm64/libAkSoundEngine.so";
 const char* TheirName = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libtersafe2.so";
 
+///////////////////////////////////////////////////////////
+// string utility
 static char* base_open_maps(const char* filename)
 {
 	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! READ MAPS");
@@ -679,59 +698,6 @@ static char* base_open_maps(const char* filename)
 	return FakeFilename;
 }
 
-//static char* base_open_status(const char* filename)
-//{
-//	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! READ MAPS");
-////RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! status_counter: %d", status_counter);
-//
-//// open true .maps
-//	FILE *TrueMapsFile = orig_fopen(filename, "r");
-//	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! True Map File: %p", TrueMapsFile);
-//	// create fake file name
-//	//char FakeFilename[1024] = {};
-//	char* FakeFilename = (char*)malloc(sizeof(char) * 1024);
-//	(status_counter = (status_counter + 1) % 10);
-//	sprintf(FakeFilename, "%s_%d", "/data/local/tmp/f_a_k_e_s_t_a_t_u_s", status_counter);
-//	// open fake .maps
-//	FILE *FakeMapsFile = orig_fopen(FakeFilename, "w");
-//	//RDCLOG("!!!!!!!!!!!!!!!!!!!!!!!!! Fake Map File: %s %p", FakeFilename, FakeMapsFile);
-//
-//	char LineBuf[1024] = {};
-//	char* OurSoPath = NULL;
-//	while (fgets(LineBuf, 1024, TrueMapsFile)) {
-//		if (starts_with(LineBuf, "TracerPid"))
-//		{
-//			sprintf(LineBuf, "TracerPid:\t0\n");
-//			fputs(LineBuf, FakeMapsFile);
-//			//RDCLOG("%s, %s, %s", Result, OurSoPath, TheirName);
-//		}
-//		else
-//		{
-//			fputs(LineBuf, FakeMapsFile);
-//		}
-//	}
-//
-//	fclose(TrueMapsFile);
-//	fclose(FakeMapsFile);
-//	return FakeFilename;
-//}
-//
-//static FILE* fopen_status(const char* filename, const char* mode)
-//{
-//	char* fn = base_open_status(filename);
-//	auto ret = orig_fopen(fn, mode);
-//	free(fn);
-//	return ret;
-//}
-//
-//static int open_status(const char* path, int oflag)
-//{	
-//	auto fn = base_open_status(path);
-//	auto ret = orig_open(fn, oflag);
-//	free(fn);
-//	return ret;
-//}
-//
 static FILE* fopen_maps(const char* filename, const char* mode)
 {
 	auto fn = base_open_maps(filename);
@@ -743,19 +709,11 @@ static FILE* fopen_maps(const char* filename, const char* mode)
 static int open_maps(const char* path, int oflag)
 {
 	auto fn = base_open_maps(path);
-  int ret = 0;
-  if(orig_open)
-	  ret = orig_open(fn, oflag);
-  else
-    ret = open(fn, oflag);
+	int ret = 0;
+	ret = orig_open(fn, oflag);
 	free(fn);
 	return ret;
 }
-
-//static void log_callstack()
-//{
-//	return;
-//}
 
 // /data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/lib/arm64/libunity.so
 // /data/app/com.cxxxr.dxxxr.a6r4m-pnDWnX65bDkYXln-U99fTQ==/lib/arm64/libdxxxv.so
@@ -765,50 +723,10 @@ extern "C" __attribute__((visibility("default"))) FILE *hooked_fopen(const char 
   {
     pid_t tid = gettid();
     RDCLOG("<%d> ################################### fopen %s, %s", tid, filename, mode);
-    //if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
-    //{
-    //	log_callstack();
-    //}
-
-    if (starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
-    {
-      // (void)fopen_maps;
-      return fopen_maps(filename, mode);
-    }
-
-    if (starts_with(filename, "/proc/") && ends_with(filename, "/status"))
-    {
-      //return fopen_status(filename, mode);
-      //(void)fopen_status;
-    }
-
-    //if (starts_with(filename, "/data/app/com.cxxxr.dxxxr.")
-      // && ends_with(filename, ".apk"))
-    //{
-      // const char* fake_apk_path = "/data/app/com.miHoYo.Yuanshen-vMTbcjONkjD8rjYmJNt07g==/base.apk";
-      // RDCLOG("*********************************** fake com.cxxxr.dxxr, %s", filename);
-      // return orig_fopen(fake_apk_path, mode);
-    //}
-    //if(starts_with(filename, "/proc/"))
-    //{
-    // if (ends_with(filename, "/maps")) {
-      //  const char *fake_maps_path = "/data/local/tmp/fake_ys.maps";
-      //  FILE* fake_file = orig_fopen(fake_maps_path, mode);
-      //  RDCLOG("################################### fake maps open %s %p", filename, fake_file);
-      //  return fake_file;
-    // }
-    // else if(ends_with(filename, "/smaps")){
-      //  const char *fake_smaps_path = "/data/local/tmp/fake_ys.smaps";
-      //  FILE* fake_file = orig_fopen(fake_smaps_path, mode);
-      //  RDCLOG("################################### fake smaps open %s %p", filename, fake_file);
-      //  return fake_file;
-    // }
+	if(starts_with(filename, "/proc/") && ends_with(filename, "/maps"))
+		return fopen_maps(filename, mode);
   }
-	 // 
-  //RDCLOG("################################### normal open %s %s", filename, mode);
-  if(orig_fopen)
-    return orig_fopen(filename, mode);
-  return fopen(filename, mode);
+  return orig_fopen(filename, mode);
 }
 
 extern "C" __attribute__((visibility("default"))) int hooked_open(const char *path, int oflag)
@@ -817,25 +735,65 @@ extern "C" __attribute__((visibility("default"))) int hooked_open(const char *pa
  {
    pid_t tid = gettid();
    RDCLOG("<%d> ************************************************ open %s, %d", tid, path, oflag);
-   //if ((starts_with("/proc/") && ends_with("/maps")) || starts_with("/data/app/com.cxxxr.dxxxr."))
-   //{
-   //	log_callstack();
-   //}
-
    if (starts_with(path, "/proc/") && ends_with(path, "/maps"))
-   {
-     return open_maps(path, oflag);
-   }
-
-   if (starts_with(path, "/proc/") && ends_with(path, "/status"))
-   {
-     //return open_status(path, oflag);
-     //(void)open_status;
-   }
+	   return open_maps(path, oflag);
  }
-  if(orig_open)
-    return orig_open(path, oflag);
-  return open(path, oflag);
+  return orig_open(path, oflag);
+}
+
+#define CLOCK_DIVISOR 1
+#define GET_TIME_OF_DAY_DIVISOR 1
+#define CLOCK_GET_TIME_DIVISOR 1
+
+
+extern "C" clock_t hooked_clock(void)
+{
+	//RDCLOG("<%d> ################################### clock", gettid());
+	clock_t ret = 0;
+	if (orig_clock) {
+		ret = orig_clock();
+	}
+	else {
+		ret = clock();
+	}
+	ret = ret / CLOCK_DIVISOR;
+	return ret;
+}
+
+extern "C" int hooked_get_time_of_day(struct timeval *tv, struct timezone *tz)
+{
+	//RDCLOG("<%d> ################################### get_time_of_day", gettid());
+	int ret = 0;
+	if (orig_get_time_of_day) {
+		ret = orig_get_time_of_day(tv, tz);
+	}
+	else {
+		ret = gettimeofday(tv, tz);
+	}
+	if (tv)
+	{
+		tv->tv_sec = tv->tv_sec / GET_TIME_OF_DAY_DIVISOR;
+		tv->tv_usec = tv->tv_usec / GET_TIME_OF_DAY_DIVISOR;
+	}
+	return ret;
+}
+
+extern "C" int hooked_clock_get_time(clockid_t clockid, struct timespec *tp)
+{
+	//RDCLOG("<%d> ################################### clock_get_time", gettid());
+	int ret = 0;
+	if (orig_clock_get_time) {
+		ret = orig_clock_get_time(clockid, tp);
+	}
+	else{
+		ret = clock_gettime(clockid, tp);
+	}
+	if (tp)
+	{
+		tp->tv_sec = tp->tv_sec / CLOCK_GET_TIME_DIVISOR;
+		tp->tv_nsec = tp->tv_nsec / CLOCK_GET_TIME_DIVISOR;
+	}
+	return ret;
 }
 
 //extern "C" __attribute__((visibility("default"))) size_t fread(void * ptr, size_t size, size_t count, FILE * stream)
@@ -845,6 +803,10 @@ extern "C" __attribute__((visibility("default"))) int hooked_open(const char *pa
 
 static void InstallHooksCommon()
 {
+	(void)fopen_maps;
+	(void)open_maps;
+	(void)starts_with;
+	(void)ends_with;
   suppressTLS = Threading::AllocateTLSSlot();
 
   // blacklist hooking certain system libraries or ourselves
@@ -867,17 +829,14 @@ static void InstallHooksCommon()
   }
   LibraryHooks::RegisterFunctionHook(
       "", FunctionHook("fopen", (void **)&orig_fopen, (void *)&hooked_fopen));
-  if(!orig_fopen)
-  {
-    orig_fopen = fopen;
-  }
-  // (void)hooked_open;
   LibraryHooks::RegisterFunctionHook(
 	 "", FunctionHook("open", (void **)&orig_open, (void *)&hooked_open));
-  //  if(!orig_open)
-  //  {
-  //    orig_open = open;
-  //  }
+  LibraryHooks::RegisterFunctionHook(
+	  "", FunctionHook("clock", (void **)&orig_clock, (void *)&hooked_clock));
+  LibraryHooks::RegisterFunctionHook(
+	  "", FunctionHook("gettimeofday", (void **)&orig_get_time_of_day, (void *)&hooked_get_time_of_day));
+  LibraryHooks::RegisterFunctionHook(
+	  "", FunctionHook("clock_gettime", (void **)&orig_clock_get_time, (void *)&hooked_clock_get_time));
   LibraryHooks::RegisterFunctionHook(
       "", FunctionHook("android_dlopen_ext", NULL, (void *)&hooked_android_dlopen_ext));
 }
